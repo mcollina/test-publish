@@ -36,4 +36,4 @@ jobs:
       - name: 'Create release notes'
         run: |
           npm i @matteo.collina/release-notes -g
-          release-notes -a ${{ secrets.GH_TOKEN }} -t ${{ inputs.version }} -r mcollina -o test-publish
+          release-notes -a ${{ secrets.GH_RELEASE_TOKEN }} -t ${{ inputs.version }} -r mcollina -o test-publish
