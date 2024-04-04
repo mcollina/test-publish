@@ -26,6 +26,8 @@ jobs:
       - run: npm install
       - name: Change version number and push
         run: |
+          git config --global user.email "hello@matteocollina.com"
+          git config --global user.name "Matteo Collina"
           npm version ${{ inputs.version }}
           git push origin HEAD:main
       - run: npm publish --provenance --access public
