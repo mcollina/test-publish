@@ -1,25 +1,37 @@
 name: Publish Package to npmjs
 
 on:
- release:
-   types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version number to tag and release'
+        required: true
+        type: string
 
 jobs:
- build:
-   runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-   permissions:
-     contents: read
-     id-token: write
+    permissions:
+      contents: read
+      id-token: write
 
-   steps:
-     - uses: actions/checkout@v3
-     - uses: actions/setup-node@v3
-       with:
-         node-version: '18'
-         registry-url: 'https://registry.npmjs.org'
-     - run: npm install -g npm@latest
-     - run: npm install
-     - run: npm publish --provenance --access public
-       env:
-         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install -g npm@latest
+      - run: npm install
+      - name: Change version number and push
+        run: |
+          npm version ${{ inputs.version }}
+          git push origin HEAD:main
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: 'Create release notes'
+        run: |
+          npm i @matteo.collina/release-notes -g
+          release-notes -a ${{ secrets.GH_TOKEN }} -t ${{ inputs.version }} -r mcollina -o test-publish
