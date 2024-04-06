@@ -49,5 +49,5 @@ jobs:
           npm i @matteo.collina/release-notes -g
           echo $VERSION
           release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina
-        ENV:
+        env:
           VERSION: ${{ steps.bump.outputs.version }}
