@@ -1,5 +1,8 @@
 name: Publish package to npm
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:
