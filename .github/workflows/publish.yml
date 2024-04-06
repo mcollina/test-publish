@@ -49,7 +49,7 @@ jobs:
 
   releasenotes:
     runs-on: ubuntu-latest
-    requires: release
+    needs: release
 
     permissions:
       contents: write
