@@ -24,8 +24,8 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
@@ -46,12 +46,26 @@ jobs:
       - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  releasenotes:
+    runs-on: ubuntu-latest
+    requires: release
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
       - name: 'Create release notes'
         run: |
           npm i @matteo.collina/release-notes -g
           echo "::debug::Creating release notes for $VERSION"
           NOTES=`release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina`
-          echo "## Released version $VERSION :rocket:"
+          echo "# Released version $VERSION :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "url: $NOTES" >> $GITHUB_STEP_SUMMARY
         env:
-          VERSION: ${{ steps.bump.outputs.version }}
+          VERSION: ${{ jobs.release.outputs.version }}
