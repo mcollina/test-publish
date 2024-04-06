@@ -51,6 +51,7 @@ jobs:
           npm i @matteo.collina/release-notes -g
           echo "::debug::Creating release notes for $VERSION"
           NOTES=`release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina`
-          echo "## Released version $VERSION :rocket:\n\nurl: $NOTES" >> $GITHUB_STEP_SUMMARY
+          echo "## Released version $VERSION :rocket:"
+          echo "url: $NOTES" >> $GITHUB_STEP_SUMMARY
         env:
           VERSION: ${{ steps.bump.outputs.version }}
