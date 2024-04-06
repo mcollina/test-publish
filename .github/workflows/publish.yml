@@ -16,7 +16,7 @@ on:
           - major
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     permissions:
@@ -47,4 +47,7 @@ jobs:
       - name: 'Create release notes'
         run: |
           npm i @matteo.collina/release-notes -g
-          release-notes -a ${{ secrets.GITHUB_TOKEN }} -t ${{ steps.bump.outputs.version }} -r test-publish -o mcollina
+          echo $VERSION
+          release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina
+        ENV:
+          VERSION: ${{ steps.bump.outputs.version }}
