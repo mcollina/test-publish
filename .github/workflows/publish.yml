@@ -1,4 +1,4 @@
-name: Publish Package to npmjs
+name: Publish package to npm
 
 on:
   workflow_dispatch:
@@ -68,4 +68,4 @@ jobs:
           echo "# Released version $VERSION :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "url: $NOTES" >> $GITHUB_STEP_SUMMARY
         env:
-          VERSION: ${{ jobs.release.outputs.version }}
+          VERSION: ${{ needs.release.outputs.version }}
