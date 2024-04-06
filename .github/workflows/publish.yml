@@ -56,6 +56,9 @@ jobs:
     permissions:
       contents: write
 
+    env:
+      VERSION: ${{ needs.release.outputs.version }}
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -71,5 +74,3 @@ jobs:
           NOTES=`release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina`
           echo "# Released version $VERSION :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "url: $NOTES" >> $GITHUB_STEP_SUMMARY
-        env:
-          VERSION: ${{ needs.release.outputs.version }}
