@@ -37,7 +37,7 @@ jobs:
           git config --global user.email "hello@matteocollina.com"
           git config --global user.name "Matteo Collina"
           npm version ${{ inputs.version || inputs.release_type }} --git-tag-version=false
-          echo "version=$(jq -r \".version\" package.json)\n" >> $GITHUB_OUTPUT
+          echo "version=$(jq -r ".version" package.json)" >> $GITHUB_OUTPUT
           git add -u
           git commit -m "Bumped v$(jq -r ".version" package.json)"
           git push origin HEAD:main
