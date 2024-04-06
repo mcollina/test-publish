@@ -5,8 +5,15 @@ on:
     inputs:
       version:
         description: 'The version number to tag and release'
-        required: true
         type: string
+      release_type:
+        description: Type of release. patch or minor (major if breaking)
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   build:
@@ -25,10 +32,14 @@ jobs:
       - run: npm install -g npm@latest
       - run: npm install
       - name: Change version number and push
+        id: bump
         run: |
           git config --global user.email "hello@matteocollina.com"
           git config --global user.name "Matteo Collina"
-          npm version ${{ inputs.version }} --git-tag-version=false
+          npm version ${{ inputs.version || inputs.release_type }} --git-tag-version=false
+          echo "version=$(jq -r \".version\" package.json)\n" >> $GITHUB_OUTPUT
+          git add -u
+          git commit -m "Bumped v$(jq -r ".version" package.json)"
           git push origin HEAD:main
       - run: npm publish --provenance --access public
         env:
@@ -36,4 +47,4 @@ jobs:
       - name: 'Create release notes'
         run: |
           npm i @matteo.collina/release-notes -g
-          release-notes -a ${{ secrets.GITHUB_TOKEN }} -t ${{ inputs.version }} -r test-publish -o mcollina
+          release-notes -a ${{ secrets.GITHUB_TOKEN }} -t ${{ steps.bump.outputs.version }} -r test-publish -o mcollina
