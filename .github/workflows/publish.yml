@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'The version number to tag and release'
+        description: 'The version number to release (has priority over release_type)'
         type: string
       release_type:
-        description: Type of release. patch or minor (major if breaking)
+        description: Type of release 
         type: choice
         default: patch
         options:
@@ -43,7 +43,6 @@ jobs:
         run: |
           npm version ${{ inputs.version || inputs.release_type }} --git-tag-version=false
           VERSION=`jq -r ".version" package.json`
-          echo "::debug::Bumped $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           git add -u
           git commit -m "Bumped v$VERSION"
@@ -70,8 +69,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: 'Install release-notes'
         run: npm i @matteo.collina/release-notes -g
-      - name: 'Debug'
-        run: echo "::debug::Creating release notes for $VERSION"
       - name: 'Create release notes'
         run: |
           NOTES=`release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina`
