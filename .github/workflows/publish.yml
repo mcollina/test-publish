@@ -31,11 +31,13 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install -g npm@latest
       - run: npm install
-      - name: Change version number and push
-        id: bump
+      - name: Git Config
         run: |
           git config --global user.email "hello@matteocollina.com"
           git config --global user.name "Matteo Collina"
+      - name: Change version number and push
+        id: bump
+        run: |
           npm version ${{ inputs.version || inputs.release_type }} --git-tag-version=false
           VERSION=`jq -r ".version" package.json`
           echo "::debug::Bumped $VERSION"
@@ -60,10 +62,12 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+      - name: 'Install release-notes'
+        run: npm i @matteo.collina/release-notes -g
+      - name: 'Debug'
+        run: echo "::debug::Creating release notes for $VERSION"
       - name: 'Create release notes'
         run: |
-          npm i @matteo.collina/release-notes -g
-          echo "::debug::Creating release notes for $VERSION"
           NOTES=`release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina`
           echo "# Released version $VERSION :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "url: $NOTES" >> $GITHUB_STEP_SUMMARY
