@@ -37,9 +37,11 @@ jobs:
           git config --global user.email "hello@matteocollina.com"
           git config --global user.name "Matteo Collina"
           npm version ${{ inputs.version || inputs.release_type }} --git-tag-version=false
-          echo "version=$(jq -r ".version" package.json)" >> $GITHUB_OUTPUT
+          VERSION=`jq -r ".version" package.json`
+          echo "::debug::Bumped $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           git add -u
-          git commit -m "Bumped v$(jq -r ".version" package.json)"
+          git commit -m "Bumped v$VERSION"
           git push origin HEAD:main
       - run: npm publish --provenance --access public
         env:
@@ -47,7 +49,8 @@ jobs:
       - name: 'Create release notes'
         run: |
           npm i @matteo.collina/release-notes -g
-          echo $VERSION
-          release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina
+          echo "::debug::Creating release notes for $VERSION"
+          NOTES=`release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v$VERSION -r test-publish -o mcollina`
+          echo "## Released version $VERSION :rocket:\n\nurl: $NOTES" >> $GITHUB_STEP_SUMMARY
         env:
           VERSION: ${{ steps.bump.outputs.version }}
